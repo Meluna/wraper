@@ -2,20 +2,156 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
     <title>DNS search tool</title>
+    {# таблица стилей элементов html страницы #}
+    <style type="text/css">
+        .header{
+            width: 99%;
+            background-color: blue;
+        }
+        .left_side_panel{
+            width: 15%;
+            float: left;
+        }
+        .blockparam {
+            width: 85%;
+        }
+        .choose_product{
+            width: 80%;
+            float: left;
+        }
+        .product_table {
+            width:100%;
+        }
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 300%;
+        }
+        .footer{
+            width: 100%;
+            background-color: blue;
+        }
+    </style>
 </head>
 <body>
-{% for a1, a2, a3, a4, a5, a6, a7, a8, a9 in hdd_array%}
-    <img src="{{ a1 }}"><br>
-    {{ a2 }}<br>
-    {{ a3 }}<br>
-    {{ a4 }}<br>
-    {{ a5 }}<br>
-    {{ a6 }}<br>
-    {{ a7 }}<br>
-    {{ a8 }}<br>
-    {{ a9 }}<br>
-    <p> --------------------------------------------------- </p>
-{% endfor %}
+{# заголовок страницы #}
+<fieldset class="header">
+    <h1 align="center" style="color: snow">DNS search tool{{ i }}<br></h1>
+</fieldset>
+<br>
+{# кнопка обновления БД на странице #}
+<a href="load"><button>Обновить БД</button></a>
+<br><br>
+<fieldset class="left_side_panel">
+<legend align="center" style="font-size: 160%">Параметры поиска:</legend>
+{# форма отправки (методом POST) значений фильтров, заданных пользователем #}
+<form method="POST">{% csrf_token %}
+{# фильтр выборки товаров по бренду #}
+  <fieldset class="blockparam">
+    <legend>Бренд</legend>
+  {# цикл формирование элементов фильтра #}
+      {% for brand in brand_array %}
+          <label>
+              <input type="checkbox" name="brand_checkbox" value="{{ brand.name }}">
+          </label>
+          <label for="checkbox">{{ brand.name }}</label>
+      <br>
+      {% endfor %}
+  </fieldset><br>
+{# фильтр выборки товаров по интерфейсу #}
+  <fieldset class="blockparam">
+      <legend>Интерфейс подключения</legend>
+  {# цикл формирование элементов фильтра #}
+      {% for interface in interface_array %}
+          <label>
+              <input type="checkbox" name="interface_checkbox" value="{{ interface.name }}">
+          </label>
+          <label for="checkbox">{{ interface.name }}</label>
+      <br>
+      {% endfor %}
+  </fieldset><br>
+{# фильтр выборки товаров по объему #}
+  <fieldset class="blockparam">
+      <legend>Объем диска</legend>
+  {# цикл формирование элементов фильтра #}
+      {% for volume in volume_array %}
+          <label>
+              <input type="checkbox" name="volume_checkbox" value="{{ volume.name }}">
+          </label>
+          <label for="checkbox">{{ volume.name }}</label>
+      <br>
+      {% endfor %}
+  </fieldset><br>
+{# фильтр выборки товаров по скорости #}
+  <fieldset class="blockparam">
+      <legend>Скорость вращения шпинделя</legend>
+  {# цикл формирование элементов фильтра #}
+      {% for speed in speed_array %}
+          <label>
+              <input type="checkbox" name="speed_checkbox" value="{{ speed.name }}">
+          </label>
+          <label for="checkbox">{{ speed.name }}</label>
+      <br>
+      {% endfor %}
+  </fieldset><br>
+{# фильтр выборки товаров по цене #}
+   <fieldset class="blockparam">
+    <legend>Цена</legend>
+          <label>
+              <input type="text" placeholder="от" name="price_min" value="0" style="width: 50px">
+              <input type="text" placeholder="до" name="price_max" value="{{ max_price }}" style="width: 50px">
+              <br>
+              *введите интервал цен
+          </label>
+  </fieldset><br>
+    <div align="center">
+        {# кнопка отправки формы, со значениями элементов управления #}
+        <button type="submit" style="font-weight: bold">НАЙТИ</button>
+    </div>
+    <br>
+</form>
+</fieldset>
+{# Таблица вывода результатов выборки даных из БД #}
+<fieldset class="choose_product">
+    <legend align="center" style="font-size: 160%">Найденно:</legend>
+    <table width="auto" border="2" class="product_table" align="center">
+        <tbody>
+        <tr>
+            {# заголовки таблицы #}
+            <th scope="col">Изображение:</th>
+            <th scope="col">Наиименование товара:</th>
+            <th scope="col">Описание товара:</th>
+            <th scope="col">Интерфейс подключения:</th>
+            <th scope="col">Объем диска:</th>
+            <th scope="col">Скорость вращения шпинделя:</th>
+            <th scope="col">Производитель товара:</th>
+            <th scope="col">Цена:</th>
+            <th scope="col">Купить:</th>
+        </tr>
+        {# цикл заполнения строк таблицы, даными #}
+        {% for image, name, brand, price, page, interface, description, volume, speed in hdd_array %}
+            <tr>
+                <td align="center"><img src={{ image }}></td>
+                <td style="text-align: center">{{ name }}</td>
+                <td style="text-align: justify">&emsp;{{ description }}</td>
+                <td align="center">{{ interface }}</td>
+                <td align="center">{{ volume }}</td>
+                <td align="center">{{ speed }}</td>
+                <td align="center">{{ brand }}</td>
+                <td align="center" style="font-weight: bold">&nbsp;{{ price }}&nbsp;руб.&nbsp;</td>
+                <td align="center"><a href="{{ page }}" target="_blank"><button>Купить</button></a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</fieldset>
+{# подвал страницы, с указанием автора приложения #}
+<fieldset class="footer">
+    <p align="left" style="color: snow; font-size: 20px">Работу выполнил:&emsp;&emsp;<br>
+        студент группы АСУ-13бз&emsp;&emsp;<br>
+        Королев Алексей Витальевич ©&emsp;&emsp;
+    </p>
+</fieldset>
 </body>
 </html>

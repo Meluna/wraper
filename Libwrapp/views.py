@@ -4,7 +4,7 @@ from Libwrapp.models import HDD, Brand, Interface, Volume, Speed
 
 # массив брендов для панели выбора бренда
 brand_array = Brand.objects.all()
-# массив брендов для панели выбора бренда
+# массив интерфейсов для панели выбора интерфейса
 interface_array = Interface.objects.all()
 # массив объемов для панели выбора объема ЖД
 volume_array = Volume.objects.all()
@@ -50,7 +50,7 @@ def main(request):
     else:
         interface_predict = ""
 
-    # --- формируем строку условия(цвет на языке sql для будущего запроса к БД ---
+    # --- формируем строку условия(объем на языке sql для будущего запроса к БД ---
     chosen_volume =""
     try:
         chosen_volume = request.POST['volume_checkbox']
@@ -72,7 +72,7 @@ def main(request):
     else:
         speed_predict = ""
 
-    # итоговый предикат выборки товаров из БД для оператора WHERE
+    # итоговое условие выборки товаров из БД для оператора WHERE
     where_predict = price_predict + \
                     brand_predict + \
                     interface_predict + \
@@ -108,7 +108,7 @@ def main(request):
                                  hdd.description,
                                  hdd.v,
                                  hdd.s])
-
+    # возврат html страницы с результатами выборки данных из БД
     return render(request, 'Libwrapp/main.html', {'hdd_array': chosen_hdd_array,
                                                   'interface_array': interface_array,
                                                   'volume_array': volume_array,
