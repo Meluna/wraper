@@ -5,5 +5,17 @@
     <title>DNS search tool</title>
 </head>
 <body>
+{% for a1, a2, a3, a4, a5, a6, a7, a8, a9 in hdd_array%}
+    <img src="{{ a1 }}"><br>
+    {{ a2 }}<br>
+    {{ a3 }}<br>
+    {{ a4 }}<br>
+    {{ a5 }}<br>
+    {{ a6 }}<br>
+    {{ a7 }}<br>
+    {{ a8 }}<br>
+    {{ a9 }}<br>
+    <p> --------------------------------------------------- </p>
+{% endfor %}
 </body>
 </html>
