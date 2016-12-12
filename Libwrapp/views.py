@@ -15,7 +15,7 @@ for price in HDD.objects.raw('''SELECT id, MAX(price) From Libwrapp_hdd;'''):
     max_price = price.price
 
 def main(request):
-    # --- формируем строку условия(цена) на языке sql для запроса к БД ---
+# --- формируем строку условия(цена) на языке sql для запроса к БД ---
     chosen_price_min = "0"
     chosen_price_max = "47499"
     try:
@@ -26,53 +26,80 @@ def main(request):
         chosen_price_max = request.POST['price_max']
     except MultiValueDictKeyError:
         pass
-    price_predict = "Libwrapp_hdd.price BETWEEN " + chosen_price_min + " AND " + chosen_price_max
 
-    # --- формируем строку условия(бренд) на языке sql для запроса к БД ---
-    chosen_brand =""
+    # ПРОВЕРКА на SQL-иньекцию
+    if(chosen_price_min.isnumeric() & chosen_price_max.isnumeric()):
+        price_predict = "Libwrapp_hdd.price BETWEEN " + chosen_price_min + " AND " + chosen_price_max
+    else:
+        price_predict = "Libwrapp_hdd.price BETWEEN 0 AND 47499"
+
+# --- формируем строку условия(бренд) на языке sql для запроса к БД ---
+    chosen_brand = ""
     try:
         chosen_brand = request.POST['brand_checkbox']
     except MultiValueDictKeyError:
         pass
-    if(chosen_brand != ""):
-        brand_predict = " AND Libwrapp_brand.name = '" + chosen_brand + "'"
+
+    # ПРОВЕРКА на SQl-иньекцию
+    if(chosen_brand.isalpha()):
+        if(chosen_brand != ""):
+            brand_predict = " AND Libwrapp_brand.name = '" + chosen_brand + "'"
+        else:
+            brand_predict = ""
     else:
         brand_predict = ""
 
-    # --- формируем строку условия(интерфейс ЖД на языке sql для запроса к БД ---
-    chosen_interface =""
+# --- формируем строку условия(интерфейс ЖД на языке sql для запроса к БД ---
+    chosen_interface = ""
     try:
         chosen_interface = request.POST['interface_checkbox']
     except MultiValueDictKeyError:
         pass
-    if (chosen_interface != ""):
-        interface_predict = " AND Libwrapp_interface.name = '" + chosen_interface + "'"
+
+    # ПРОВЕРКА на SQl-иньекцию
+    if (chosen_interface.replace(" ", "")).isalpha():
+        if chosen_interface != "":
+            interface_predict = " AND Libwrapp_interface.name = '" + chosen_interface + "'"
+        else:
+            interface_predict = ""
     else:
         interface_predict = ""
 
-    # --- формируем строку условия(объем на языке sql для будущего запроса к БД ---
-    chosen_volume =""
+# --- формируем строку условия(объем на языке sql для будущего запроса к БД ---
+    chosen_volume = ""
     try:
         chosen_volume = request.POST['volume_checkbox']
     except MultiValueDictKeyError:
         pass
-    if (chosen_volume != ""):
-        volume_predict = " AND Libwrapp_volume.name = '" + chosen_volume + "'"
-    else:
+
+    # ПРОВЕРКА на SQl-иньекцию
+    v_tmp = chosen_volume.split()
+    try:
+        if (v_tmp[0].isnumeric() & v_tmp[1].isalpha()):
+            volume_predict = " AND Libwrapp_volume.name = '" + chosen_volume + "'"
+        else:
+            volume_predict = ""
+    except IndexError:
         volume_predict = ""
 
-    # --- формируем строку условия(скрость ЖД на языке sql для запроса к БД ---
-    chosen_speed =""
+# --- формируем строку условия(скрость ЖД на языке sql для запроса к БД ---
+    chosen_speed = ""
     try:
         chosen_speed = request.POST['speed_checkbox']
     except MultiValueDictKeyError:
         pass
-    if (chosen_speed != ""):
-        speed_predict = " AND Libwrapp_speed.name = '" + chosen_speed + "'"
-    else:
+
+    # ПРОВЕРКА на SQl-иньекцию
+    sp_tmp = chosen_speed.split()
+    try:
+        if (sp_tmp[0].isnumeric() & sp_tmp[1].isalpha()):
+            speed_predict = " AND Libwrapp_volume.name = '" + chosen_speed + "'"
+        else:
+            speed_predict = ""
+    except IndexError:
         speed_predict = ""
 
-    # итоговое условие выборки товаров из БД для оператора WHERE
+# --- итоговое условие выборки товаров из БД для оператора WHERE
     where_predict = price_predict + \
                     brand_predict + \
                     interface_predict + \

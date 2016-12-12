@@ -10,7 +10,6 @@ def load(request):
     # очистака таблиц HDD, Brand, Interface, Volume, Speed
     HDD.objects.all().delete()
     Brand.objects.all().delete()
-    Interface.objects.all().delete()
     Volume.objects.all().delete()
     Speed.objects.all().delete()
 
@@ -29,13 +28,6 @@ def load(request):
     for i in range(0, len(brand_list)):
         obj_brand = Brand(name = brand_list[i]('span')[0].string) # текущий элемент списка
         obj_brand.save() # сохранение в БД
-
-    # Поиск всех интерфейсов(SATA III, SATA II и т.д.) на странице
-    interface_list = soup_obj1.body.find('div', id="checkbox-list-n2").findAll('input', type="checkbox")
-
-    for i in range(0, len(interface_list)):
-        obj_interface = Interface(name = interface_list[i]('span')[0].string)
-        obj_interface.save()
 
     # Поиск объемов ЖД на странице
     volume_list = soup_obj1.body.find('div', id="checkbox-list-n1").findAll('input', type="checkbox")
