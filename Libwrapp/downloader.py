@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+#импорт регулярных выражений
+import re
 # импорт модуля обработки ссылок (получение страниц с таковым адресом с удаленного сервера)
 import urllib.request
 # импорт парсера
@@ -7,7 +9,7 @@ from bs4 import BeautifulSoup
 from Libwrapp.models import HDD, Brand, Interface, Volume, Speed
 
 def load(request):
-    # очистака таблиц HDD, Brand, Interface, Volume, Speed
+    # очистака таблиц HDD, Brand, Volume, Speed
     HDD.objects.all().delete()
     Brand.objects.all().delete()
     Volume.objects.all().delete()
@@ -23,21 +25,21 @@ def load(request):
     soup_obj1 = BeautifulSoup(readed_page, "html.parser")
 
     # Поиск всех брендов на странице
-    brand_list = soup_obj1.body.find('div', id="checkbox-list-brand").findAll('input', type="checkbox")
+    brand_list = soup_obj1.find('div', id = re.compile('^checkbox-list-brand-\w+$')).findAll('input', type="checkbox")
     # цикл добавления списка брендов в БД
     for i in range(0, len(brand_list)):
         obj_brand = Brand(name = brand_list[i]('span')[0].string) # текущий элемент списка
         obj_brand.save() # сохранение в БД
 
     # Поиск объемов ЖД на странице
-    volume_list = soup_obj1.body.find('div', id="checkbox-list-n1").findAll('input', type="checkbox")
+    volume_list = soup_obj1.find('div', id = re.compile('^checkbox-list-n1-\w+$')).findAll('input', type="checkbox")
 
     for i in range(0, len(volume_list)):
         obj_volume = Volume(name = volume_list[i]('span')[0].string)
         obj_volume.save()
 
     # Поиск скоростей ЖД на странице
-    speed_list = soup_obj1.body.find('div', id="checkbox-list-134").findAll('input', type="checkbox")
+    speed_list = soup_obj1.find('div', id = re.compile('^checkbox-list-134-\w+$')).findAll('input', type="checkbox")
 
     for i in range(1, len(speed_list)):
         obj_speed = Speed(name = speed_list[i]('span')[0].string)
@@ -55,7 +57,7 @@ def load(request):
         # запрос страницы с результатами для конкретного бренда ЖД
         product_resp = urllib.request.urlopen(
             'http://www.dns-shop.ru/catalog/17a8914916404e77/zhestkie-diski-35/?mode=list'
-            + '&brand=' + str(brand['id']))
+            + '&brand=' + str(brand['value']))
         # чтение страницы
         readed_page2 = product_resp.read()
         # парсинг страницы

@@ -41,7 +41,7 @@ def main(request):
         pass
 
     # ПРОВЕРКА на SQl-иньекцию
-    if(chosen_brand.isalpha()):
+    if(chosen_brand.replace(" ", "")).isalpha():
         if(chosen_brand != ""):
             brand_predict = " AND Libwrapp_brand.name = '" + chosen_brand + "'"
         else:
@@ -93,7 +93,7 @@ def main(request):
     sp_tmp = chosen_speed.split()
     try:
         if (sp_tmp[0].isnumeric() & sp_tmp[1].isalpha()):
-            speed_predict = " AND Libwrapp_volume.name = '" + chosen_speed + "'"
+            speed_predict = " AND Libwrapp_speed.name = '" + chosen_speed + "'"
         else:
             speed_predict = ""
     except IndexError:
